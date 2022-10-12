@@ -1,8 +1,8 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import AWS = require('aws-sdk');
+import { DynamoDB } from 'aws-sdk';
 import { v4 } from 'uuid';
 
-const dbClient = new AWS.DynamoDB.DocumentClient()
+const dbClient = new DynamoDB.DocumentClient()
 
 async function handler(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult>{
     const result: APIGatewayProxyResult = {
@@ -10,9 +10,8 @@ async function handler(event: APIGatewayProxyEvent, context: Context): Promise<A
         body:'hello from dynamodb'
     }
 
-    const item = {
-        spaceId: v4()
-    }
+    const item = typeof event.body === 'object' ? event.body : JSON.parse(event.body)
+    item.spaceId = v4()
 
     try {
         await dbClient.put({
@@ -22,6 +21,7 @@ async function handler(event: APIGatewayProxyEvent, context: Context): Promise<A
     } catch (error) {
         result.body =  `${error}`
     }
+    result.body = JSON.stringify(`Created with id: ${item.spaceId}`)
 
     return result
 }
