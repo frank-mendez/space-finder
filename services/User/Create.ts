@@ -14,14 +14,15 @@ async function handler(event: APIGatewayProxyEvent, context: Context): Promise<A
     }
 
     const item = typeof event.body === 'object' ? event.body : JSON.parse(event.body)
-    item.spaceId = v4()
+    item.userId = v4()
 
-    result.body = JSON.stringify(`Created with id: ${item.spaceId}`)
+        
+    result.body = JSON.stringify(`Created with id: ${item.userId}`)
 
     await dbClient.put({
             TableName: TABLE_NAME!,
             Item: item
-        }).promise().then(data => console.log(data.Attributes)).catch(console.error)
+        }).promise()
 
     return result
 }
