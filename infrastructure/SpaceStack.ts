@@ -34,6 +34,10 @@ export class SpaceStack extends Stack {
         const helloLambdaResource = this.api.root.addResource('hello')
         helloLambdaResource.addMethod('GET', helloLambdaIntegration)
 
+        //Space API Integration
+        const spaceResource = this.api.root.addResource('spaces')
+        spaceResource.addMethod("POST", this.spacesTable.createLambdaIntegration)
+
     }
 
 }

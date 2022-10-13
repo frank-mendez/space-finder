@@ -1,4 +1,13 @@
+@endpoint = https://rbckrp3od8.execute-api.us-east-1.amazonaws.com/prod
 
+GET {{endpoint}}/hello
+###
 
-GET https://rbckrp3od8.execute-api.us-east-1.amazonaws.com/prod/hello
+POST {{endpoint}}/spaces
+Content-Type: 'application/json',
+
+{
+    "location": "Philippines",
+    "name": "Best Vacation location"
+}
 ###
