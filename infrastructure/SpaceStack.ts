@@ -13,7 +13,8 @@ export class SpaceStack extends Stack {
     private spacesTable = new GenericTable(this,  {
         tableName: 'SpacesTable',
         primaryKey: 'spaceId',
-        createLambdaPath: 'Create'
+        createLambdaPath: 'Create',
+        readLambdaPath: 'Read'
     })
 
     private userTable = new GenericTable(this, {
@@ -42,6 +43,7 @@ export class SpaceStack extends Stack {
         //Space API Integration
         const spaceResource = this.api.root.addResource('spaces')
         spaceResource.addMethod("POST", this.spacesTable.createLambdaIntegration)
+        spaceResource.addMethod("GET", this.spacesTable.readLambdaIntegration)
 
         //User API Integration
         const userResource = this.api.root.addResource('users')

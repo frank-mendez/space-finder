@@ -11,3 +11,9 @@ Content-Type: 'application/json',
     "name": "Best Vacation location"
 }
 ###
+
+GET {{endpoint}}/spaces
+###
+
+GET {{endpoint}}/spaces/6898f0dd-7bcb-4bf6-8c03-61e9e2192def
+###
