@@ -15,5 +15,5 @@ Content-Type: 'application/json',
 GET {{endpoint}}/spaces
 ###
 
-GET {{endpoint}}/spaces/6898f0dd-7bcb-4bf6-8c03-61e9e2192def
+GET {{endpoint}}/spaces?location=London
 ###

@@ -1,44 +1,93 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import { DynamoDB } from 'aws-sdk';
+import {
+    APIGatewayProxyEvent,
+    APIGatewayProxyEventQueryStringParameters,
+    APIGatewayProxyResult,
+    Context
+} from "aws-lambda";
+import { DynamoDB } from "aws-sdk";
 
-const TABLE_NAME = process.env.TABLE_NAME
-const PRIMARY_KEY = process.env.PRIMARY_KEY
+const TABLE_NAME = process.env.TABLE_NAME;
+const PRIMARY_KEY = process.env.PRIMARY_KEY;
 const dbClient = new DynamoDB.DocumentClient({
-    region: 'us-east-1'
-})
+    region: "us-east-1"
+});
 
-async function handler(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult>{
+const handler = async (
+    event: APIGatewayProxyEvent,
+    context: Context
+): Promise<APIGatewayProxyResult> => {
     const result: APIGatewayProxyResult = {
         statusCode: 200,
-        body:'hello from dynamodb'
-    }
+        body: "hello from dynamodb"
+    };
     try {
-       if(event.queryStringParameters) {
-            if(PRIMARY_KEY! in event.queryStringParameters){
-                const keyValue = event.queryStringParameters[PRIMARY_KEY!]
-                const queryResponse = await dbClient.query({
-                    TableName: TABLE_NAME!,
-                    KeyConditionExpression: '#zz = :zzzz',
-                    ExpressionAttributeNames: {
-                        '#zz': PRIMARY_KEY!
-                    },
-                    ExpressionAttributeValues: {
-                        ':zzzz': keyValue
-                    }
-                }).promise()
-                result.body = JSON.stringify(queryResponse)
+        if (event.queryStringParameters) {
+            if (PRIMARY_KEY! in event.queryStringParameters) {
+                result.body = await queryWithPrimaryPartion(
+                    event.queryStringParameters
+                );
+            } else {
+                result.body = await queryWithSecondaryPartion(
+                    event.queryStringParameters
+                );
             }
-       } else {
-         const queryResponse = await dbClient.scan({
-            TableName: TABLE_NAME!,
-        }).promise()
-        result.body = JSON.stringify(queryResponse)
-       }
+        } else {
+            result.body = await scanTable();
+        }
     } catch (error) {
-        result.body = JSON.stringify(error)
+        result.body = JSON.stringify(error);
     }
 
-    return result
-}
+    return result;
+};
 
-export {handler}
+const queryWithSecondaryPartion = async (
+    queryParams: APIGatewayProxyEventQueryStringParameters
+) => {
+    const queryKey = Object.keys(queryParams)[0];
+    const queryValue = queryParams[queryKey];
+    const queryResponse = await dbClient
+        .query({
+            TableName: TABLE_NAME!,
+            IndexName: queryKey,
+            KeyConditionExpression: "#zz = :zzzz",
+            ExpressionAttributeNames: {
+                "#zz": queryKey
+            },
+            ExpressionAttributeValues: {
+                ":zzzz": queryValue
+            }
+        })
+        .promise();
+    return JSON.stringify(queryResponse.Items);
+};
+
+const queryWithPrimaryPartion = async (
+    queryParams: APIGatewayProxyEventQueryStringParameters
+) => {
+    const keyValue = queryParams[PRIMARY_KEY!];
+    const queryResponse = await dbClient
+        .query({
+            TableName: TABLE_NAME!,
+            KeyConditionExpression: "#zz = :zzzz",
+            ExpressionAttributeNames: {
+                "#zz": PRIMARY_KEY!
+            },
+            ExpressionAttributeValues: {
+                ":zzzz": keyValue
+            }
+        })
+        .promise();
+    return JSON.stringify(queryResponse);
+};
+
+const scanTable = async () => {
+    const queryResponse = await dbClient
+        .scan({
+            TableName: TABLE_NAME!
+        })
+        .promise();
+    return JSON.stringify(queryResponse.Items);
+};
+
+export { handler };

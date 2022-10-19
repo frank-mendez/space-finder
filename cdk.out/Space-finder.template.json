@@ -678,6 +678,28 @@
      {
       "AttributeName": "spaceId",
       "AttributeType": "S"
+     },
+     {
+      "AttributeName": "location",
+      "AttributeType": "S"
+     }
+    ],
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "location",
+      "KeySchema": [
+       {
+        "AttributeName": "location",
+        "KeyType": "HASH"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      },
+      "ProvisionedThroughput": {
+       "ReadCapacityUnits": 5,
+       "WriteCapacityUnits": 5
+      }
      }
     ],
     "ProvisionedThroughput": {
@@ -748,7 +770,18 @@
          ]
         },
         {
-         "Ref": "AWS::NoValue"
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "SpacesTable8A997355",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
         }
        ]
       }
@@ -862,7 +895,18 @@
          ]
         },
         {
-         "Ref": "AWS::NoValue"
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "SpacesTable8A997355",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
         }
        ]
       }
@@ -887,7 +931,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "efa7598429ed0168e5a79e97e6c89e5fdd0955fc2cff68881485dc5be9955220.zip"
+     "S3Key": "cc2971d90637f853be9e742ae54fc1da98eb37f09f1f9cc81214d94e012d0441.zip"
     },
     "Role": {
      "Fn::GetAtt": [
@@ -912,7 +956,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "Space-finder/SpacesTable-Read/Resource",
-    "aws:asset:path": "asset.efa7598429ed0168e5a79e97e6c89e5fdd0955fc2cff68881485dc5be9955220",
+    "aws:asset:path": "asset.cc2971d90637f853be9e742ae54fc1da98eb37f09f1f9cc81214d94e012d0441",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
